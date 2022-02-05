@@ -1,0 +1,65 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Opinion{
+  id    Int   @id @default(autoincrement())
+  book  Book  @relation(fields: [bookId], references: [id])
+  bookId Int
+  description String
+  user  User @relation(fields: [userId], references: [id])
+  userId Int
+  rate  Int
+}
+
+model Book{
+  id    Int   @id @default(autoincrement())
+  category    BookCategory @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  title   String
+  author    String
+  dateStart   DateTime @default(now())
+  dateEnd     DateTime  @default(now())
+  opinions    Opinion[]
+}
+
+model BookCategory{
+  id    Int   @id @default(autoincrement())
+  bookGroup   BookGroup   @relation(fields: [bookGroupId], references: [id])
+  bookGroupId     Int
+  name      String
+  isActive  Boolean @default(false)
+  wasPicked Boolean @default(false)
+  book      Book?
+}
+
+model BookGroup{
+  id     Int     @id @default(autoincrement())
+  users   BookGroupsToUsers[]
+  categories  BookCategory[]
+  creatorId Int @default(-1)
+  name    String 
+
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String
+  password String
+  bookGroups     BookGroupsToUsers[] 
+  opinions Opinion[]
+}
+
+model BookGroupsToUsers {
+  bookGroup       BookGroup     @relation(fields: [bookGroupId], references: [id])
+  bookGroupId    Int // relation scalar field (used in the `@relation` attribute above)
+  user User @relation(fields: [userId], references: [id])
+  userId Int // relation scalar field (used in the `@relation` attribute above)
+  @@id([userId,bookGroupId])
+}

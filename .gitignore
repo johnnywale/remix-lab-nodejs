@@ -1,0 +1,9 @@
+build
+node_modules
+package-lock.json
+.env
+coverage
+.husky
+.vscode
+.idea
+postgresql_data
